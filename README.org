@@ -1,0 +1,35 @@
+#+TITLE: Reproducible Bioinformatic research
+#+AUTHOR: Markus Johansson
+#+EMAIL: markus.johansson@1928diagnostics.com
+#+STARTUP: showall
+
+* Introduction
+This repository contains the lecture, examples and some general tips for making more reproducible bioinformatic research.
+
+* Example pipeline
+As an example of the concepts introduced in the lecture the repository contains a simple pipeline. The pipeline is designed to be ran in a docker container.
+
+#+NAME: pipeline-flowchart
+#+CAPTION: Major components in the example pipeline.
+#+BEGIN_SRC dot :file ./img/pipeline_overview.png :cmdline -Kdot -Tpng :results file
+    digraph G {
+      size="12,10"
+      ratio=autor
+
+      fq_data -> mapping -> depth -> plot -> result;
+      fa_data -> mapping;
+
+      fq_data [shape=parallelogram, label="Raw NGS data"]
+      fa_data [shape=parallelogram, label="Reference gene"]
+      mapping [style=filled, fillcolor=azure2, shape=record, label="{ Mapp reads|BWA mem}"]
+      depth [style=filled, fillcolor=azure2, shape=record, label="{ Calculate coverage|samtools depth }"]
+      plot [style=filled, fillcolor=darkolivegreen3, shape=record, label="{ Plot read coverage|matplotlib }"]
+      result [shape=note, label="read_cov.png"]
+    }
+#+END_SRC
+
+#+RESULTS: pipeline-flowchart
+[[file:./img/pipeline_overview.png]]
+
+* Pipeline requirements
+* How to execute the pipeline
