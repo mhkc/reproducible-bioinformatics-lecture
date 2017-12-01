@@ -1,0 +1,37 @@
+"""Handles command line interface for the pipeline."""
+import click
+
+from .context import ExecutionContext
+from .mapping import calc_read_coverage, index_reference, mapp_reads, sort_sam
+from .plot import plot_coverages
+
+
+@click.command()
+@click.option('-q', '--fastq_file', type=click.Path(exists=True))
+@click.option('-f', '--fasta_file', type=click.Path(exists=True))
+@click.option('-t', '--threads', type=int, default=1,
+              help='Number of threads [Default: 1]')
+@click.argument('output', default='read_coverage.png')
+def cli(fastq_file, fasta_file, threads, output):
+    """Plot number of reads mapping to a given gene in fasta format."""
+    # Check input files
+    if fastq_file is None and fasta_file is None:
+        raise click.UsageError('You must specify both a fasta and fastq file')
+
+    # Store execution parameters in a immutable container
+    context = ExecutionContext(sample_location=fastq_file,
+                               reference_location=fasta_file,
+                               threads=threads, output=output)
+
+    # step 1: index the reference sequence
+    index_path = index_reference(context)
+
+    # step 2: mapp reads to reference sequence and sort the output on position
+    aln_file = mapp_reads(context, index_path)
+    sorted_aln_file = sort_sam(context, aln_file)
+
+    # step 3: calculate read coverage on reference sequence
+    read_coverage = calc_read_coverage(context, sorted_aln_file)
+
+    # step 4: plot read coverage
+    plot_coverages(context, read_coverage)
