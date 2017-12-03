@@ -31,4 +31,12 @@ RUN set -exu                                                                    
 RUN mkdir -p /usr/src/example_pipeline/data
 WORKDIR /usr/src/example_pipeline
 
-CMD ["/bin/bash"]  # Run bash
+# Copy python requirements file
+COPY ./example_pipeline/requirements.txt /usr/src/example_pipeline/requirements.txt
+
+#  Install python dependencies
+RUN pip install --no-cache-dir -r /usr/src/example_pipeline/requirements.txt
+
+COPY ./example_pipeline /usr/src/example_pipeline
+# Run bash
+CMD ["/bin/bash"]
