@@ -6,6 +6,7 @@ run:
 		--name=example-pipeline																								\
 		-it																																		\
 		--volume $(CURDIR)/volumes/temp_files:/tmp/example_pipeline						\
+		--volume $(CURDIR)/volumes/results:/usr/src/example_pipeline/results	\
 		--volume $(CURDIR)/volumes/data:/usr/src/example_pipeline/data				\
 		example-pipeline
 
