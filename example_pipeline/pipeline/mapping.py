@@ -25,20 +25,21 @@ def index_reference(ctx: ExecutionContext) -> str:
 def mapp_reads(ctx, indexed_ref):
     """Map reads against a reference sequence using BWA."""
     # Naively remove file suffix by splitting on '.' and taking the first entry
-    sample_name = os.path.basename(ctx.sample_location).split('.')[0]
+    sample_name = os.path.basename(ctx.sample_location[0]).split('.')[0]
     reference_name = os.path.basename(ctx.reference_location).split('.')[0]
+
     # Define output file
     sam_file = ctx.path(f'{sample_name}_{reference_name}.sam')
 
     if not os.path.isfile(sam_file):
         """
-        BWA mem has no option to write output to file, instead we capture standard out
-        and writes it with a seperate function.
+        BWA mem has no option to write output to file, instead we capture
+        standard out and writes it with a seperate function.
         """
         result = run_shell_cmd(['bwa', 'mem',
                                 '-t', ctx.threads,
                                 indexed_ref,
-                                ctx.sample_location])
+                                *ctx.sample_location])
         result.write_stdout(sam_file)  # Write results to file
     return sam_file
 
@@ -46,8 +47,8 @@ def mapp_reads(ctx, indexed_ref):
 def sort_sam(ctx, sam_file):
     """Sort file on mapping position.
 
-    Sorting converts the file to bam format (binary-sam)."""
-
+    Sorting converts the file to bam format (binary-sam).
+    """
     # Rename file
     sorted_file = sam_file.replace('.sam', '-sorted.bam')
     if not os.path.isfile(sorted_file):
@@ -73,8 +74,9 @@ def parse_read_cov(cov_file):
 def calc_read_coverage(ctx, aln_file):
     """Calculate read coverage per base in reference file."""
     # Naively remove file suffix by splitting on '.' and taking the first entry
-    sample_name = os.path.basename(ctx.sample_location).split('.')[0]
+    sample_name = os.path.basename(ctx.sample_location[0]).split('.')[0]
     reference_name = os.path.basename(ctx.reference_location).split('.')[0]
+
     # Define output file
     coverage_file = ctx.path(f'{sample_name}_{reference_name}_cov.txt')
 

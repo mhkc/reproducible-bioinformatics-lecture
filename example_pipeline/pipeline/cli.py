@@ -7,15 +7,15 @@ from .plot import plot_coverages
 
 
 @click.command()
-@click.option('-q', '--fastq_file', type=click.Path(exists=True))
-@click.option('-f', '--fasta_file', type=click.Path(exists=True))
+@click.option('-q', '--fastq-file', type=click.Path(exists=True), multiple=True)
+@click.option('-f', '--fasta-file', type=click.Path(exists=True))
 @click.option('-t', '--threads', type=int, default=1,
               help='Number of threads [Default: 1]')
 @click.argument('output', default='read_coverage.png')
 def cli(fastq_file, fasta_file, threads, output):
     """Plot number of reads mapping to a given gene in fasta format."""
     # Check input files
-    if fastq_file is None and fasta_file is None:
+    if len(fastq_file) is 0 and fasta_file is None:
         raise click.UsageError('You must specify both a fasta and fastq file')
 
     # Store execution parameters in a immutable container

@@ -1,6 +1,7 @@
 """Handles context information containers."""
 import os
 import tempfile
+from typing import Tuple
 
 import attr
 
@@ -12,8 +13,14 @@ class ExecutionContext:
     """Immutable storage of execution context and parameters."""
 
     # Execution parameters
+    # convert path from relative to absolute with convert function
     reference_location: str = attr.ib(convert=os.path.realpath)
-    sample_location: str = attr.ib(convert=os.path.realpath)
+
+    # Since realpath expects sting as input, use lambda function
+    # to iterate over each entry
+    sample_location: Tuple = attr.ib(
+        convert=lambda x: tuple(os.path.realpath(e) for e in x))
+
     output: str = attr.ib(convert=os.path.realpath)
     threads: int = attr.ib()
 
