@@ -4,10 +4,14 @@
 #+STARTUP: showall
 
 * Introduction
-This repository contains the lecture, examples and some general tips for making more reproducible bioinformatic research.
+This repository contains the examples used in the lecture and some general tips for making more reproducible bioinformatic research.
 
 * Example pipeline
 As an example of the concepts introduced in the lecture the repository contains a simple pipeline. The pipeline is designed to be ran in a docker container.
+
+The pipeline is intended to illustrate some programming concepts rather than conducting any meaningful analysis, hence the overenginered design and simple function.
+
+The pipeline aligns reads, using =BWA=, from a NGS sample to a reference sequence in fasta format. The number of reads covering a each base in the reference sequence is calculated using =samtools depth= and plotted using =matplotlib= and =pandas= [[pipeline-flowchart]].
 
 #+NAME: pipeline-flowchart
 #+CAPTION: Major components in the example pipeline.
@@ -17,13 +21,14 @@ As an example of the concepts introduced in the lecture the repository contains 
       ratio=autor
 
       fq_data -> mapping -> depth -> plot -> result;
-      fa_data -> mapping;
+      fa_data -> index -> mapping;
 
       fq_data [shape=parallelogram, label="Raw NGS data"]
       fa_data [shape=parallelogram, label="Reference gene"]
-      mapping [style=filled, fillcolor=azure2, shape=record, label="{ Mapp reads|BWA mem}"]
+      index [style=filled, fillcolor=azure2, shape=record, label="{ index reference|bwa index}"]
+      mapping [style=filled, fillcolor=azure2, shape=record, label="{ mapp reads|bwa mem}"]
       depth [style=filled, fillcolor=azure2, shape=record, label="{ Calculate coverage|samtools depth }"]
-      plot [style=filled, fillcolor=darkolivegreen3, shape=record, label="{ Plot read coverage|matplotlib }"]
+      plot [style=filled, fillcolor=darkolivegreen3, shape=record, label="{ Plot read coverage|matplotlib & pandas }"]
       result [shape=note, label="read_cov.png"]
     }
 #+END_SRC
@@ -32,4 +37,63 @@ As an example of the concepts introduced in the lecture the repository contains 
 [[file:./img/pipeline_overview.png]]
 
 * Pipeline requirements
-* How to execute the pipeline
+ - [Docker Engine](https://docs.docker.com/engine/installation/) ( Version 17.09.0+ )
+ - wget (for downloading data with [[./download_example_files.sh][download_example_files.sh]])
+
+** On a Mac
+ - Launch the Docker.app that you've installed and provide the credentials as needed for the initial setup.
+ - In the Docker.app preferences, make the following adjustments.
+   + Advanced: Dedicate >2 CPUs and >4GB of RAM to Docker.
+   + Apply and Restart
+
+* How to execute pipeline
+Begin with downloading the example input files to the [[./data][data]] folder using the script [[./download_example_files.sh][download_example_files]]. The script downloads a  clinical sample from a  /Staphylococcus aureus/ MRSA outbreak at a special care baby unit (SCBU) in Cambridge [fn:1].
+
+#+NAME: download-example-data
+#+BEGIN_SRC bash
+./download_example_files.sh
+#+END_SRC
+To build, run and stop the pipeline you need to do the following steps. You can to them by either running the following shell commands in you terminal or using the [[./Makefile][Makefile]] with the arguments =build=, =run= and =stop=. The makefile runs the same commands, it's just a convenient wrapper.
+
+To run the pipeline, you need to build a container image using either the following [[build-container-image][shell command]], you only need to do this once since the build image is then stored on your computer.
+
+#+NAME: build-container-image
+#+BEGIN_SRC bash
+docker build . -t example-pipeline
+#+END_SRC
+
+After the image has been build you need to boot an instance of the image with the [[run-pipeline-container][following command]]. This will take you into the command line of the booted container. *NOTE* Do not use =sudo= inside a container since it might create files, or give access to files, outside of the container and thus break the isolated environment.
+
+#+NAME: run-pipeline-container
+#+BEGIN_SRC bash
+  docker run                                                                  \
+         --name=example-pipeline                                              \
+         -it                                                                  \
+         --volume $(CURDIR)/volumes/temp_files:/tmp/example_pipeline          \
+         --volume $(CURDIR)/volumes/results:/usr/src/example_pipeline/results \
+         --volume $(CURDIR)/volumes/data:/usr/src/example_pipeline/data       \
+         example-pipeline
+#+END_SRC
+
+Use the [[run-pipeline][following command]] to run the pipeline inside the booted container.
+
+#+NAME: run-pipeline
+#+BEGIN_SRC bash
+  ./run_pipeline.py --threads 2                                                       \
+                    --fasta-file data/blaZ.fna                                        \
+                    --fastq-file data/ERR418327_1.fastq.gz results/read_coverage.png
+#+END_SRC
+
+When you have finished running the sample. Exit the container with =ctrl-d=. The resulting plot should now be located in [[./volumes/results/]] and the generated alignments and intermediary files should be located in [[./volumes/temp_files]]. If you want to run additional samples in the pipeline, please empty the folders but *dont* remove them since it could cause errors with file permissions in the docker container.
+
+When you are finished. Stop all running containers with the following command [[stop-docker-container][following command]].
+
+#+NAME: stop-docker-container
+#+BEGIN_SRC bash
+	docker container stop example-pipeline
+	docker container rm example-pipeline
+#+END_SRC
+
+* Footnotes
+
+[fn:1] Simon R Harris, Edward JP Cartwright, M Estée Török, Matthew TG Holden, Nicholas M Brown, Amanda L Ogilvy-Stuart, Matthew J Ellington, Michael A Quail, Stephen D Bentley, Julian Parkhill, Sharon J Peacock, Whole-genome sequencing for analysis of an outbreak of meticillin-resistant Staphylococcus aureus: a descriptive study, In The Lancet Infectious Diseases, Volume 13, Issue 2, 2013, Pages 130-136, ISSN 1473-3099, https://doi.org/10.1016/S1473-3099(12)70268-2.
