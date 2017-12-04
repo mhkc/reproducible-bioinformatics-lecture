@@ -47,12 +47,19 @@ The pipeline aligns reads, using =BWA=, from a NGS sample to a reference sequenc
    + Apply and Restart
 
 * How to execute pipeline
-Begin with downloading the example input files to the [[./data][data]] folder using the script [[./download_example_files.sh][download_example_files]]. The script downloads a  clinical sample from a  /Staphylococcus aureus/ MRSA outbreak at a special care baby unit (SCBU) in Cambridge [fn:1].
+To download the pipeline you need to first clone the repository to your computer with the [[clone-repository][following command]].
+#+NAME: clone-repository
+#+BEGIN_SRC bash
+git clone https://mhkj@bitbucket.org/mhkj/reproducible-bioinformatic-research.git
+#+END_SRC
+
+The pipeline comes with a [[./download_example_files.sh][script]] for downloading example files to the folder [[./volumes/data]]. The example is a clinical isolate from a  /Staphylococcus aureus/ MRSA outbreak at a special care baby unit (SCBU) in Cambridge [fn:1].
 
 #+NAME: download-example-data
 #+BEGIN_SRC bash
 ./download_example_files.sh
 #+END_SRC
+
 To build, run and stop the pipeline you need to do the following steps. You can to them by either running the following shell commands in you terminal or using the [[./Makefile][Makefile]] with the arguments =build=, =run= and =stop=. The makefile runs the same commands, it's just a convenient wrapper.
 
 To run the pipeline, you need to build a container image using either the following [[build-container-image][shell command]], you only need to do this once since the build image is then stored on your computer.
@@ -66,12 +73,12 @@ After the image has been build you need to boot an instance of the image with th
 
 #+NAME: run-pipeline-container
 #+BEGIN_SRC bash
-  docker run                                                                  \
-         --name=example-pipeline                                              \
-         -it                                                                  \
-         --volume $(CURDIR)/volumes/temp_files:/tmp/example_pipeline          \
-         --volume $(CURDIR)/volumes/results:/usr/src/example_pipeline/results \
-         --volume $(CURDIR)/volumes/data:/usr/src/example_pipeline/data       \
+  docker run                                                              \
+         --name=example-pipeline                                          \
+         -it                                                              \
+         --volume $PWD/volumes/temp_files:/tmp/example_pipeline           \
+         --volume $PWD/volumes/results:/usr/src/example_pipeline/results  \
+         --volume $PWD/volumes/data:/usr/src/example_pipeline/data        \
          example-pipeline
 #+END_SRC
 
@@ -79,9 +86,11 @@ Use the [[run-pipeline][following command]] to run the pipeline inside the boote
 
 #+NAME: run-pipeline
 #+BEGIN_SRC bash
-  ./run_pipeline.py --threads 2                                                       \
-                    --fasta-file data/blaZ.fna                                        \
-                    --fastq-file data/ERR418327_1.fastq.gz results/read_coverage.png
+  ./run_pipeline.py --threads 2                               \
+                    --fasta-file ./data/blaz.fna              \
+                    --fastq-file ./data/err418327_1.fastq.gz  \
+                    --fastq-file ./data/err418327_2.fastq.gz  \
+                    results/read_coverage.png
 #+END_SRC
 
 When you have finished running the sample. Exit the container with =ctrl-d=. The resulting plot should now be located in [[./volumes/results/]] and the generated alignments and intermediary files should be located in [[./volumes/temp_files]]. If you want to run additional samples in the pipeline, please empty the folders but *dont* remove them since it could cause errors with file permissions in the docker container.
