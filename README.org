@@ -2,6 +2,8 @@
 #+AUTHOR: Markus Johansson
 #+EMAIL: markus.johansson@1928diagnostics.com
 #+STARTUP: showall
+#+PROPERTY: header-args:bash :exports code
+#+OPTIONS: toc:nil ^:nil
 
 * Introduction
 This repository contains the examples used in the lecture and some general tips for making more reproducible bioinformatic research.
@@ -11,11 +13,11 @@ As an example of the concepts introduced in the lecture the repository contains 
 
 The pipeline is intended to illustrate some programming concepts rather than conducting any meaningful analysis, hence the overenginered design and simple function.
 
-The pipeline aligns reads, using =BWA=, from a NGS sample to a reference sequence in fasta format. The number of reads covering a each base in the reference sequence is calculated using =samtools depth= and plotted using =matplotlib= and =pandas= [[pipeline-flowchart]].
+The pipeline aligns reads, using =BWA=, from a NGS sample to a reference sequence in fasta format. The number of reads covering a each base in the reference sequence is calculated using =samtools depth= and plotted using =matplotlib= and =pandas=.
 
 #+NAME: pipeline-flowchart
 #+CAPTION: Major components in the example pipeline.
-#+BEGIN_SRC dot :file ./img/pipeline_overview.png :cmdline -Kdot -Tpng :results file
+#+BEGIN_SRC dot :file ./img/pipeline_overview.png :cmdline -Kdot -Tpng :results file :exports results
     digraph G {
       size="12,10"
       ratio=autor
@@ -37,8 +39,8 @@ The pipeline aligns reads, using =BWA=, from a NGS sample to a reference sequenc
 [[file:./img/pipeline_overview.png]]
 
 * Pipeline requirements
- - [Docker Engine](https://docs.docker.com/engine/installation/) ( Version 17.09.0+ )
- - wget (for downloading data with [[./download_example_files.sh][download_example_files.sh]])
+ - Docker Engine :: [[https://docs.docker.com/engine/installation/]] ( Version 17.09.0+ )
+ - GNU wget :: for downloading data with [[./download_example_files.sh][download_example_files.sh]] ( Version 1.19.2+ )
 
 ** On a Mac
  - Launch the Docker.app that you've installed and provide the credentials as needed for the initial setup.
@@ -49,7 +51,7 @@ The pipeline aligns reads, using =BWA=, from a NGS sample to a reference sequenc
 * How to execute pipeline
 To download the pipeline you need to first clone the repository to your computer with the [[clone-repository][following command]].
 #+NAME: clone-repository
-#+BEGIN_SRC bash
+#+BEGIN_SRC bash :exports code
 git clone https://mhkj@bitbucket.org/mhkj/reproducible-bioinformatic-research.git
 #+END_SRC
 
@@ -105,4 +107,4 @@ When you are finished. Stop all running containers with the following command [[
 
 * Footnotes
 
-[fn:1] Simon R Harris, Edward JP Cartwright, M Estée Török, Matthew TG Holden, Nicholas M Brown, Amanda L Ogilvy-Stuart, Matthew J Ellington, Michael A Quail, Stephen D Bentley, Julian Parkhill, Sharon J Peacock, Whole-genome sequencing for analysis of an outbreak of meticillin-resistant Staphylococcus aureus: a descriptive study, In The Lancet Infectious Diseases, Volume 13, Issue 2, 2013, Pages 130-136, ISSN 1473-3099, https://doi.org/10.1016/S1473-3099(12)70268-2.
+[fn:1] Simon R Harris, Edward JP Cartwright, M Estée Török, Matthew TG Holden, Nicholas M Brown, Amanda L Ogilvy-Stuart, Matthew J Ellington, Michael A Quail, Stephen D Bentley, Julian Parkhill, Sharon J Peacock, Whole-genome sequencing for analysis of an outbreak of meticillin-resistant Staphylococcus aureus: a descriptive study, In The Lancet Infectious Diseases, Volume 13, Issue 2, 2013, Pages 130-136, ISSN 1473-3099, [[https://doi.org/10.1016/S1473-3099(12)70268-2]].
