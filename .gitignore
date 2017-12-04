@@ -3,3 +3,7 @@ __pycache__
 
 .python-version
 /example_pipeline/*.png
+/volumes/data/*
+/volumes/temp_files/*
+/volumes/results/*
+!.gitkeep
