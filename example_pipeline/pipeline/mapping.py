@@ -1,3 +1,4 @@
+"""Functions for mapping and calc read coverage."""
 import os
 
 import pandas as pd
@@ -24,7 +25,7 @@ def index_reference(ctx: ExecutionContext) -> str:
 def mapp_reads(ctx, indexed_ref):
     """Map reads against a reference sequence using BWA."""
     # Naively remove file suffix by splitting on '.' and taking the first entry
-    # sample_name = os.path.basename(ctx.sample_location[0]).split('.')[0]
+    sample_name = os.path.basename(ctx.sample_location[0]).split('.')[0]
     reference_name = os.path.basename(ctx.reference_location).split('.')[0]
 
     # Define output file
@@ -71,6 +72,7 @@ def parse_read_cov(cov_file: str) -> pd.DataFrame:
 
 
 def calc_read_coverage(ctx, aln_file):
+    """Calculate read coverage using samtools depth."""
     # Naively remove file suffix by splitting on '.' and taking the first entry
     sample_name = os.path.basename(ctx.sample_location[0]).split('.')[0]
     reference_name = os.path.basename(ctx.reference_location).split('.')[0]
