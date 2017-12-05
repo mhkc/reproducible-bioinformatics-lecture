@@ -1,5 +1,6 @@
 """Functions for plotting and output generation."""
 
+import logging
 import os
 
 import matplotlib
@@ -10,6 +11,8 @@ import pandas as pd
 
 from .context import ExecutionContext
 
+LOG = logging.getLogger('example_pipeline')
+
 
 def plot_coverages(ctx: ExecutionContext, cov: pd.DataFrame) -> None:
     """Plot read coverage."""
@@ -17,6 +20,7 @@ def plot_coverages(ctx: ExecutionContext, cov: pd.DataFrame) -> None:
     sample_name = os.path.basename(ctx.sample_location[0]).split('.')[0]
     reference_name = os.path.basename(ctx.reference_location).split('.')[0]
 
+    LOG.info('[plotting] %s' % ctx.output)
     cov.plot(x='position', y='coverage')  # Plot results
 
     # Set title & and save fig
