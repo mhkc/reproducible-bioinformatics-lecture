@@ -1,10 +1,9 @@
 """Functions for plotting and output generation."""
+import matplotlib  # isort:skip
+matplotlib.use('Agg')  # isort:skip
 
 import logging
 import os
-
-import matplotlib
-matplotlib.use('Agg')
 
 import matplotlib.pyplot as plt
 import pandas as pd
