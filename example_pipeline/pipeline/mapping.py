@@ -22,7 +22,7 @@ def index_reference(ctx: ExecutionContext) -> str:
     return index_path
 
 
-def mapp_reads(ctx, indexed_ref):
+def mapp_reads(ctx: ExecutionContext, indexed_ref: str) -> str:
     """Map reads against a reference sequence using BWA."""
     # Naively remove file suffix by splitting on '.' and taking the first entry
     sample_name = os.path.basename(ctx.sample_location[0]).split('.')[0]
@@ -44,7 +44,7 @@ def mapp_reads(ctx, indexed_ref):
     return sam_file
 
 
-def sort_sam(ctx, sam_file):
+def sort_sam(ctx: ExecutionContext, sam_file: str) -> str:
     """Sort file on mapping position.
 
     Sorting converts the file to bam format (binary-sam).
@@ -59,7 +59,7 @@ def sort_sam(ctx, sam_file):
     return sorted_file
 
 
-def parse_read_cov(cov_file):
+def parse_read_cov(cov_file: str) -> pd.DataFrame:
     """Parse read coverage from samtools depth output.
 
     samtools depth output is tab delimitered and has 3 columns;
@@ -71,7 +71,7 @@ def parse_read_cov(cov_file):
                        names=['seq_name', 'position', 'coverage'])
 
 
-def calc_read_coverage(ctx, aln_file):
+def calc_read_coverage(ctx: ExecutionContext, aln_file: str) -> pd.DataFrame:
     """Calculate read coverage per base in reference file."""
     # Naively remove file suffix by splitting on '.' and taking the first entry
     sample_name = os.path.basename(ctx.sample_location[0]).split('.')[0]
