@@ -3,12 +3,18 @@ FROM library/python:3.6.3
 
 # Define version of the software being installed through wget with environment variables
 ENV BWA_VERSION="0.7.15"                        \
+    BOWTIE_VERSION="1.2.2"                      \
     SAMTOOLS_VERSION="1.5"
 
 # Install pipeline dependencies from github releases.
 # set -exu tells bash to:
 #   1. exit if one subcommand crashes (finishes with non 0 exit code)
 #   2. prints commands and arguments when they are executing
+RUN set -exu                                    \
+    && apt-get update                           \
+    && apt-get install -y libtbb-dev            \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN set -exu                                                                                                            \
     && mkdir -p /usr/src/deps                                                                                           \
     # bwa                                                                                                               \
@@ -24,6 +30,15 @@ RUN set -exu                                                                    
     && wget https://github.com/samtools/samtools/releases/download/$SAMTOOLS_VERSION/samtools-$SAMTOOLS_VERSION.tar.bz2 \
     && tar xjf samtools-$SAMTOOLS_VERSION.tar.bz2                                                                       \
     && cd samtools-$SAMTOOLS_VERSION                                                                                    \
+    && make                                                                                                             \
+    && make install                                                                                                     \
+                                                                                                                        \
+    # bowtie                                                                                                            \
+    && mkdir -p /usr/src/deps                                                                                           \
+    && cd /usr/src/deps                                                                                                 \
+    && wget https://github.com/BenLangmead/bowtie/archive/v${BOWTIE_VERSION}_p1.tar.gz                                  \
+    && tar xzf v${BOWTIE_VERSION}_p1.tar.gz                                                                             \
+    && cd bowtie-${BOWTIE_VERSION}_p1                                                                                   \
     && make                                                                                                             \
     && make install
 
